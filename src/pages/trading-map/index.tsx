@@ -4,6 +4,7 @@ import { useState } from "react";
 import { RowsData } from "../../services/models";
 import { sumTotal } from "../../utils";
 import CardCountry from "./Card";
+import WorldMap from "./WorldMap";
 
 interface IProps {
   data: RowsData[];
@@ -13,16 +14,24 @@ const TradingMap = (props: IProps) => {
   const { data = [] } = props;
   const [tab, setTab] = useState<string>("shipments");
   const listArea = data.map((i) => i.area);
-  const removeDuplicates = [...new Set(listArea)];
-  const total = sumTotal(data);
-
+  const removeDuplicatesArea = [...new Set(listArea)];
+  const groupArea = removeDuplicatesArea
+    ? removeDuplicatesArea
+        .map((i) => {
+          const groupCountry = data.filter((item) => item.area === i) || [];
+          const totalArea = sumTotal(groupCountry);
+          return { area: i, totalArea, groupCountry };
+        })
+        .sort((a, b) => b.totalArea - a.totalArea)
+    : [];
+  const totalWorld = sumTotal(data);
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setTab(newValue);
   };
 
   return (
-    <div className="bg-white max-w-[1400px] w-[1067px] p-6">
-      <div className="w-full flex justify-between py-4 items-center">
+    <div className="bg-white max-w-[1400px] w-[1067px] p-6 rounded-md">
+      <div className="w-full flex justify-between mb-4 items-center">
         <p className="font-medium text-lg text-gray-900">Top 5 Trading Area</p>
         <div className="flex items-center gap-2">
           <p className="text-black text-[12px] font-medium">Unit By</p>
@@ -62,17 +71,21 @@ const TradingMap = (props: IProps) => {
           </Tabs>
         </div>
       </div>
-
+      <WorldMap
+        data={data}
+        totalWorld={totalWorld}
+        groupArea={groupArea}
+        tab={tab}
+      />
       <div className="w-full grid grid-cols-5 gap-3">
-        {removeDuplicates.map((i) => {
-          const groupCountry = data.filter((item) => item.area === i) || [];
-          const totalArea = sumTotal(groupCountry);
+        {groupArea.map((i, index) => {
           return (
             <CardCountry
-              key={i}
-              area={i}
-              total={(totalArea / total) * 100}
-              country={groupCountry}
+              key={i?.area}
+              area={i?.area}
+              total={(i?.totalArea / totalWorld) * 100}
+              country={i?.groupCountry}
+              index={index}
             />
           );
         })}

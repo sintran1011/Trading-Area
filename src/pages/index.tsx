@@ -232,7 +232,7 @@ const mockData = [
 
 const Home = () => {
   return (
-    <div className="min-w-[100vw] min-h-screen flex flex-col gap-4 items-center">
+    <div className="min-w-[100vw] min-h-screen flex flex-col gap-4 items-center bg-gray-100 p-8">
       <TradingMap data={mockData} />
       <TradingTable data={mockData} />
     </div>
