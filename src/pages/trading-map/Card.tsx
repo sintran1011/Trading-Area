@@ -1,16 +1,18 @@
 import React from "react";
 import { RowsData } from "../../services/models";
-import { formatComma } from "../../utils";
+import { formatComma, renderColorByIndex } from "../../utils";
 
 interface IProps {
   area: string;
   total: number;
   country: RowsData[];
+  index: number;
 }
 
 const CardCountry = (props: IProps) => {
-  const { area, total = 0, country = [] } = props;
+  const { area, total = 0, country = [], index = 0 } = props;
   const rowCss = "flex justify-between items-center";
+  const colorTitle = renderColorByIndex(index);
   const renderRows = () => {
     return (
       <>
@@ -36,7 +38,10 @@ const CardCountry = (props: IProps) => {
       <p className="text-lg text-gray-700 font-medium leading-6 text-center mb-2">
         {area}
       </p>
-      <p className="text-3xl text-black text-center mb-2">
+      <p
+        style={{ color: colorTitle }}
+        className="text-3xl text-black text-center mb-2"
+      >
         {total.toFixed(2)}%
       </p>
       <div className="grid grid-cols-1 gap-2">{renderRows()}</div>

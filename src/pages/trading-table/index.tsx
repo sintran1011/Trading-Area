@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { RowsData } from "../../services/models";
 import { Button } from "@mui/material";
-import { formatComma } from "../../utils";
+import { formatComma, handleExport } from "../../utils";
 
 interface IProps {
   data: RowsData[];
@@ -30,26 +30,36 @@ const TradingTable = (props: IProps) => {
       headerName: "Proportion (%)",
       width: 130,
       headerClassName: "bg-gray-200",
+      valueGetter: (val) => Number(val),
     },
     {
       field: "shipments",
       headerName: "Shipments",
       width: 150,
-      valueGetter: (val) => formatComma(val),
+      renderCell: (val: GridRenderCellParams<any, string>) =>
+        formatComma(val.value as string),
       headerClassName: "bg-gray-200",
+      sortComparator: (a, b) => {
+        return Number(a) - Number(b);
+      },
     },
     {
       field: "weight",
       headerName: "Weight (KG)",
       width: 160,
-      valueGetter: (val) => formatComma(val),
+      renderCell: (val: GridRenderCellParams<any, string>) =>
+        formatComma(val.value as string),
       headerClassName: "bg-gray-200",
+      sortComparator: (a, b) => {
+        return Number(a) - Number(b);
+      },
     },
     {
       field: "teu",
       headerName: "TEU",
       width: 160,
       headerClassName: "bg-gray-200",
+      valueGetter: (val) => Number(val),
     },
     {
       field: "value",
@@ -59,12 +69,19 @@ const TradingTable = (props: IProps) => {
     },
   ];
   return (
-    <div className="bg-white max-w-[1400px] p-6">
+    <div className="bg-white max-w-[1400px] p-6 rounded-md">
       <div className="flex justify-between items-center w-full mb-4">
         <p className="font-medium text-lg text-gray-900 ">
           Trade Country Table Data
         </p>
-        <Button variant="outlined">Export</Button>
+        <Button
+          onClick={() => {
+            handleExport(data);
+          }}
+          variant="outlined"
+        >
+          Export
+        </Button>
       </div>
       <div className="h-[400px] w-full ">
         <DataGrid
@@ -78,6 +95,7 @@ const TradingTable = (props: IProps) => {
           pageSizeOptions={[10, 15, 20]}
           disableColumnFilter
           disableColumnMenu
+          disableRowSelectionOnClick
           sx={{
             "& .MuiDataGrid-scrollbar::-webkit-scrollbar": {
               width: "0.4em",
